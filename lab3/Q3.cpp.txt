@@ -1,0 +1,97 @@
+#include <iostream>
+#include <time.h>
+#include <cstdlib>
+#include <ctime>
+#include <unistd.h>
+using namespace std;
+class timer
+{
+public:
+    unsigned long s;
+    void start()
+    {
+        s = clock();
+    }
+    unsigned long elapsedTime()
+    {
+        return ((unsigned long)clock() - s) / CLOCKS_PER_SEC;
+    }
+    bool isTimeout(unsigned long seconds)
+    {
+        return seconds >= elapsedTime();
+    }
+};
+int main()
+{
+    int frames[] = {1, 2, 3, 4, 5};
+    unsigned long seconds = 5;
+    srand(time(NULL));
+    timer t;
+    cout << "Sender has to send frames : ";
+    for (int i = 0; i < 5; i++)
+        cout << frames[i] << " ";
+    cout << endl;
+    int count = 0;
+    bool delay = false;
+    cout << endl
+         << "Sender\t\t\t\t\tReceiver" << endl;
+    do
+    {
+        bool timeout = false;
+        cout << "Sending Frame : " << frames[count];
+        cout.flush();
+        cout << "\t\t";
+        t.start();
+        if (rand() % 2)
+        {
+            int l = 24600 + rand() % (64000 - 24600) + 1;
+            for (int i = 0; i < 64000; i++)
+                for (int j = 0; j < l; j++)
+                {}
+        }
+        if (t.elapsedTime() <= seconds)
+        {
+            cout << "Received Frame : " << frames[count] << " ";
+            if (delay)
+            {
+                cout << "Duplicate";
+                delay = false;
+            }
+            cout << endl;
+            count++;
+        }
+        else
+        {
+            cout << "---" << endl;
+            cout << "Timeout" << endl;
+            timeout = true;
+        }
+        t.start();
+        if (rand() % 2 || !timeout)
+        {
+            int l = 8000 + rand() % (64000 - 8000) + 1;
+            for (int i = 0; i < 64000; i++)
+                for (int j = 0; j < l; j++)
+                {}
+            if (t.elapsedTime() > seconds)
+            {
+                cout << "Delayed Ack" << endl;
+                if(!timeout)
+                {
+                    count--;
+                }
+                delay = true;
+            }
+            else if (!timeout)
+                
+                if(count==5)
+                {
+                    cout << "Acknowledgement : " << frames[count-1] << endl;
+                }
+                else{
+                    cout << "Acknowledgement : " << frames[count] - 1 << endl;
+                }
+        }
+    } while (count != 5);
+    return 0;
+}
